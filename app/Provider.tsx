@@ -8,6 +8,7 @@ import {
 import Loader from '@/components/ui/Loader';
 import { getClerkUsers, getDocumentUsers } from '@/lib/actions/user.actions';
 import { useUser } from '@clerk/nextjs';
+import { redirect } from 'next/navigation';
 
 const Provider = ({ children }: { children: ReactNode }) => {
   const { user: clerkUser } = useUser();
@@ -20,9 +21,10 @@ const Provider = ({ children }: { children: ReactNode }) => {
         return users;
       }}
       resolveMentionSuggestions={async ({ text, roomId }) => {
+        if (!clerkUser) redirect('/sign-in');
         const roomUsers = await getDocumentUsers({
           roomId,
-          currentUser: clerkUser?.emailAddresses[0].emailAddress!,
+          currentUser: clerkUser.emailAddresses[0].emailAddress,
           text,
         });
         return roomUsers;
